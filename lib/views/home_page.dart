@@ -32,18 +32,33 @@ class _MyHomePageState extends State<MyHomePage> {
   
   @override
   Widget build(BuildContext context) {
-    return Visibility(
-      visible: isLoadded,
-      replacement: Center(child: CircularProgressIndicator()),
-      child: Scaffold(
-        appBar: AppBar(),
-        body: ListView.builder(
+    return Scaffold(
+      appBar: AppBar(),
+      body: Visibility(
+        visible: isLoadded,
+        replacement: CircularProgressIndicator(),
+          child: GridView.builder(
           itemCount: eventos?.length,
-          itemBuilder: ((context, index) {
-            return Text(eventos![index].evento);
-          })
+          itemBuilder: (context, index) => 
+          Column(
+              children: [
+                Expanded(child: Text('1 ${eventos![index].evento}')),
+              ],
+            ),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8
+          ),
         ),
       ),
     );
   }
 }
+
+// ListView.builder(
+//           itemCount: eventos?.length,
+//           itemBuilder: ((context, index) {
+//             return Text(eventos![index].evento);
+//           })
+//         ),
