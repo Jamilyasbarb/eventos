@@ -1,4 +1,5 @@
 import 'package:eventos/models/evento_model.dart';
+import 'package:eventos/models/hora_evento_model.dart';
 import 'package:flutter/material.dart';
 
 import '../services/evento_service.dart';
@@ -12,45 +13,75 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Evento>? eventos;
-   bool isLoadded = false;
+  int hora = 6;
+  int minuto = 00;
+  bool isLoadded = false;
+  List<HoraEvento> listaHora = [
+  ];
+
+  List<HoraEvento> addHora() {
+    for(var i = 0; i < 20; i++){
+    HoraEvento horaEvento = HoraEvento(hora: hora, minuto: minuto);
+      if (horaEvento.hora == hora) {
+        listaHora.add(horaEvento);
+        print(listaHora[i].hora);
+        print(minuto);
+        minuto+= 30;
+        if (minuto == 60) {
+          minuto = 0;
+          if(hora != 22){
+            hora++;
+          }else{
+            break;
+          }
+        }
+      }
+    }
+    return listaHora;
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getData();
   }
 
-  getData() async{
+  getData() async {
     eventos = await EventoService().getEventos();
-    if(eventos != null){
+    if (eventos != null) {
       setState(() {
         print(eventos?[0].evento);
         isLoadded = true;
       });
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
+    if(hora != 22){
+      addHora();
+    }
     return Scaffold(
       appBar: AppBar(),
       body: Visibility(
         visible: isLoadded,
         replacement: CircularProgressIndicator(),
-          child: GridView.builder(
-          itemCount: eventos?.length,
-          itemBuilder: (context, index) => 
-          Column(
-              children: [
-                Expanded(child: Text('1 ${eventos![index].evento}')),
-              ],
-            ),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 7,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8
-          ),
-        ),
+        child: ListView.builder(
+            itemCount: listaHora.length,
+            itemBuilder: ((context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${listaHora[index].hora}:${listaHora[index].minuto}'),
+                    Divider(
+                      color: Colors.black,
+                    ),
+                  ],
+                ),
+              );
+            })),
       ),
     );
   }
@@ -61,4 +92,19 @@ class _MyHomePageState extends State<MyHomePage> {
 //           itemBuilder: ((context, index) {
 //             return Text(eventos![index].evento);
 //           })
+//         ),
+
+// GridView.builder(
+//           itemCount: eventos?.length,
+//           itemBuilder: (context, index) => 
+//           Column(
+//               children: [
+//                 Expanded(child: Text('1 ${eventos![index].evento}')),
+//               ],
+//             ),
+//           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//             crossAxisCount: 7,
+//             crossAxisSpacing: 8,
+//             mainAxisSpacing: 8
+//           ),
 //         ),

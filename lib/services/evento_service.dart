@@ -7,7 +7,7 @@ import '../models/evento_model.dart';
 class EventoService{
 
   Future<List<Evento>> getEventos()async{
-    var response = await http.get(Uri.parse('http://192.168.0.105:8080/eventos'));
+    var response = await http.get(Uri.parse('https://spskills-events.azurewebsites.net/eventos'));
       print(response.statusCode);
       print('objectrrrrrrrrrrrrooooooooo');
 
