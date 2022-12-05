@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
-
 import 'package:eventos/models/calendar_model.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import 'package:eventos/models/evento_model.dart';
 import 'package:eventos/models/hora_evento_model.dart';
 import '../services/evento_service.dart';
@@ -10,24 +11,37 @@ class MyHomePage extends StatefulWidget {
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
+  
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var data;
+
+  final DateTime now = DateTime.now();
   List<Evento>? eventos;
   int hora = 6;
   int minuto = 00;
   bool isLoadded = false;
-  List<HoraEvento> listaHora = [
-  ];
+  final DateFormat dia = DateFormat('d');
+  final DateFormat mes = DateFormat('M');
+  final DateFormat ano = DateFormat('y');
+  List<HoraEvento> listaHora = [];
 
 
   @override
   void initState() {
     super.initState();
+    getCalendar();
     getData();
   }
 
+  Calendar getCalendar(){
+    String dataDia = dia.format(now);
+    String dataMes = mes.format(now);
+    String dataAno = ano.format(now);
+    Calendar calendar = Calendar(dia: int.parse(dataDia), mes: int.parse(dataMes),
+      ano: int.parse(dataAno), listaHora: listaHora);
+    return calendar;
+  }
   getData() async {
     eventos = await EventoService().getEventos();
     if (eventos != null) {
@@ -40,13 +54,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<HoraEvento> addHora() {
     for(var i = 0; i < 20; i++){
-    // data = DateTime.parse(eventos![i].dataHora);   
-    data = DateTime.utc(2022);
-    print(data);
-    HoraEvento horaEvento = HoraEvento(hora: hora, minuto: minuto);
+
+      HoraEvento horaEvento = HoraEvento(hora: hora, minuto: minuto);
       listaHora.add(horaEvento);
-      // print(listaHora[i].hora);
-      // print(minuto);
       minuto+= 30;
       if (minuto == 60) {
         minuto = 0;
@@ -57,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
     }
+    
     // Calendar calendar = Calendar()
     return listaHora;
   }
@@ -76,7 +87,29 @@ class _MyHomePageState extends State<MyHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Data')
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      getCalendar().dia--;
+                      // print(--);
+                    });
+                    // print('click 1');
+                  },
+                  child: Icon(Icons.arrow_back_ios),
+                ),
+                Text(
+                  '${getCalendar().dia}/${getCalendar().mes}/${getCalendar().ano}',
+                  style: TextStyle(fontSize: 30),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      // dia.;
+                    // print('click 2');
+                    });
+                  },
+                  child: Icon(Icons.arrow_forward_ios_outlined),
+                ),
               ],
             ),
             Expanded(

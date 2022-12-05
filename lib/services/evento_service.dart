@@ -8,11 +8,11 @@ class EventoService{
 
   Future<List<Evento>> getEventos()async{
     var response = await http.get(Uri.parse('https://spskills-events.azurewebsites.net/eventos'));
-      print(response.statusCode);
-      print('objectrrrrrrrrrrrrooooooooo');
+      // print(response.statusCode);
+      // print('objectrrrrrrrrrrrrooooooooo');
 
     if(response.statusCode == 200){
-      print('objectrrrrrrrrrrrrooooooooo');
+      // print('objectrrrrrrrrrrrrooooooooo');
       var json = response.body;
       return eventoFromJson(json); 
     }else{
