@@ -15,36 +15,42 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   final DateTime now = DateTime.now();
   List<Evento>? eventos;
   int hora = 6;
   int minuto = 00;
   bool isLoadded = false;
-  final DateFormat dia = DateFormat('d');
-  final DateFormat mes = DateFormat('M');
-  final DateFormat ano = DateFormat('y');
+  DateTime? dateBackend;
+  // int dia = 0;
+  // int mes = 0;
+  // int ano = 0;
+  int day = 0;
+  int month = 0;
+  int year = 0;
+  int ultimoDiaMesFormatted = 0;
+  int ultimoDiaMesAnteriorFormatted = 0;
   List<HoraEvento> listaHora = [];
 
 
   @override
   void initState() {
     super.initState();
-    getCalendar();
     getData();
+     
+    // dia = now.day;
+    // mes = now.month;
+    // ano = now.year;
+   
+    print(day);
   }
 
-  Calendar getCalendar(){
-    String dataDia = dia.format(now);
-    String dataMes = mes.format(now);
-    String dataAno = ano.format(now);
-    Calendar calendar = Calendar(dia: int.parse(dataDia), mes: int.parse(dataMes),
-      ano: int.parse(dataAno), listaHora: listaHora);
-    return calendar;
-  }
   getData() async {
     eventos = await EventoService().getEventos();
     if (eventos != null) {
+      dateBackend = DateTime.parse(eventos![1].dataHora);
+      day = dateBackend!.day;
+      month = dateBackend!.month;
+      year = dateBackend!.year;
       setState(() {
         // print(eventos?[0].evento);
         isLoadded = true;
@@ -54,7 +60,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<HoraEvento> addHora() {
     for(var i = 0; i < 20; i++){
-
       HoraEvento horaEvento = HoraEvento(hora: hora, minuto: minuto);
       listaHora.add(horaEvento);
       minuto+= 30;
@@ -74,6 +79,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    DateTime ultimoDiaMes = DateTime(year, month + 1, 0);
+    print('mes testeeeee$month');
+    print('uktimo dia mes$ultimoDiaMesFormatted');
+    DateTime ultimoDiaMesAnterior = DateTime(year, month, 0);
+    ultimoDiaMesFormatted = ultimoDiaMes.day;
+    print('ultimo dia formatado $ultimoDiaMesFormatted');
+    ultimoDiaMesAnteriorFormatted = ultimoDiaMesAnterior.day;
+    Calendar calendar = Calendar(dia: day, mes: month,
+      ano: year, listaHora: listaHora);
+
+
+
     if(hora != 22){
       addHora();
     }    
@@ -87,41 +104,58 @@ class _MyHomePageState extends State<MyHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                GestureDetector(
-                  onTap: () {
+                IconButton(
+                  icon: Icon(Icons.arrow_back_ios),
+                  onPressed: () {
                     setState(() {
-                      getCalendar().dia--;
-                      // print(--);
+                      if(day != 1){
+                        day--;
+                      }else{
+                        month--;
+                        print(ultimoDiaMesFormatted);
+                        day = ultimoDiaMesAnteriorFormatted;
+                      }
+                      print(day);
                     });
-                    // print('click 1');
                   },
-                  child: Icon(Icons.arrow_back_ios),
                 ),
                 Text(
-                  '${getCalendar().dia}/${getCalendar().mes}/${getCalendar().ano}',
+                  '${calendar.dia}/${calendar.mes}/${calendar.ano}',
                   style: TextStyle(fontSize: 30),
                 ),
-                GestureDetector(
-                  onTap: () {
+                IconButton(
+                  icon: Icon(Icons.arrow_forward_ios_outlined),
+                  onPressed: () {
                     setState(() {
-                      // dia.;
-                    // print('click 2');
+                      print('ultimo dia $ultimoDiaMesFormatted');
+                      if(day != ultimoDiaMesFormatted){
+                        day++;
+                      }else{
+                        if(month != 12){
+                          month++;
+                          day = 1;
+                        }else{
+                          day = 1;
+                          month = 1;
+                          year++;
+                        }
+                      }
+                      print(day);
                     });
                   },
-                  child: Icon(Icons.arrow_forward_ios_outlined),
                 ),
               ],
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: listaHora.length,
+                itemCount: calendar.listaHora.length,
                 itemBuilder: ((context, index) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${listaHora[index].hora}:${listaHora[index].minuto}'),
+                        Text('${calendar.listaHora[index].hora}:${calendar.listaHora[index].minuto}'),
                         Divider(
                           color: Colors.black,
                         ),
