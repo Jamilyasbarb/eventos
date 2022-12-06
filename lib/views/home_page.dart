@@ -20,6 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int hora = 6;
   int minuto = 00;
   bool isLoadded = false;
+  bool registrarEvento = false;
   DateTime? dateBackend;
   // int dia = 0;
   // int mes = 0;
@@ -36,12 +37,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     getData();
-     
     // dia = now.day;
     // mes = now.month;
     // ano = now.year;
-   
-    print(day);
   }
 
   getData() async {
@@ -54,6 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         // print(eventos?[0].evento);
         isLoadded = true;
+        // print('passei aqui no temEvento()');
+        temEvento();
       });
     }
   }
@@ -72,19 +72,42 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
     }
-    
-    // Calendar calendar = Calendar()
     return listaHora;
+  }
+
+   int temEvento(){
+    for(var i =0; i <= eventos!.length; i++){
+      // print(eventos!.length);
+      // print(i);
+      DateTime data = DateTime.parse(eventos![1].dataHora);
+      print('dia 1${data.day}');
+      print('dia 2 $day');
+      print(data.year);
+      print('year $year');
+      print(data.month);
+      print('month $month');
+      if(data.day == day && data.month == month && data.year == year){
+        for(var j = 0; j < listaHora.length; j++){
+          if(listaHora[j].hora == data.hour){
+            setState(() {
+              print('true no registrar evento');
+              registrarEvento = true;
+              return i;
+            });
+          }
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     DateTime ultimoDiaMes = DateTime(year, month + 1, 0);
-    print('mes testeeeee$month');
-    print('uktimo dia mes$ultimoDiaMesFormatted');
+    // print('mes testeeeee$month');
+    // print('uktimo dia mes$ultimoDiaMesFormatted');
     DateTime ultimoDiaMesAnterior = DateTime(year, month, 0);
     ultimoDiaMesFormatted = ultimoDiaMes.day;
-    print('ultimo dia formatado $ultimoDiaMesFormatted');
+    // print('ultimo dia formatado $ultimoDiaMesFormatted');
     ultimoDiaMesAnteriorFormatted = ultimoDiaMesAnterior.day;
     Calendar calendar = Calendar(dia: day, mes: month,
       ano: year, listaHora: listaHora);
@@ -155,9 +178,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${calendar.listaHora[index].hora}:${calendar.listaHora[index].minuto}'),
+                        Row(
+                          children: [
+                            Text('${calendar.listaHora[index].hora}:${calendar.listaHora[index].minuto}'),
+                            Text(registrarEvento?'${eventos![index].evento}' : ''),
+                          ],
+                        ),
                         Divider(
                           color: Colors.black,
+
                         ),
                       ],
                     ),
