@@ -30,7 +30,7 @@ class Evento{
       evento: json['evento'] ?? '',
       descricao: json['descricao'] ?? '',
       local: json['local'] ?? '',
-      listaPessoas: List<Pessoa>.from(json['pessoa']?.map((x) => Pessoa.fromJson(x)) ?? const []),
+      listaPessoas: List<Pessoa>.from(json['pessoas']?.map((x) => Pessoa.fromJson(x)) ?? const []),
       dataHora: json['dataHora'] ?? '', 
     );
   }

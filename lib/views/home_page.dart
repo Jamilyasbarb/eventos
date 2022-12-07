@@ -25,6 +25,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // int dia = 0;
   // int mes = 0;
   // int ano = 0;
+  int posicaoDia = 0;
+  int contPessoa = 0;
   int day = 0;
   int month = 0;
   int year = 0;
@@ -50,10 +52,9 @@ class _MyHomePageState extends State<MyHomePage> {
       month = dateBackend!.month;
       year = dateBackend!.year;
       setState(() {
-        // print(eventos?[0].evento);
+        print(eventos![0].listaPessoas[0].nome);
         isLoadded = true;
-        // print('passei aqui no temEvento()');
-        temEvento();
+        // temEvento();
       });
     }
   }
@@ -75,50 +76,65 @@ class _MyHomePageState extends State<MyHomePage> {
     return listaHora;
   }
 
-   int temEvento(){
-    for(var i =0; i <= eventos!.length; i++){
-      // print(eventos!.length);
-      // print(i);
-      DateTime data = DateTime.parse(eventos![1].dataHora);
-      print('dia 1${data.day}');
-      print('dia 2 $day');
-      print(data.year);
-      print('year $year');
-      print(data.month);
-      print('month $month');
+  bool verificaHora(int hora){
+    registrarEvento = false;
+    posicaoDia = 0;
+    for(var i =0; i < eventos!.length; i++){
+      DateTime data = DateTime.parse(eventos![i].dataHora);
       if(data.day == day && data.month == month && data.year == year){
-        for(var j = 0; j < listaHora.length; j++){
-          if(listaHora[j].hora == data.hour){
-            setState(() {
-              print('true no registrar evento');
-              registrarEvento = true;
-              return i;
-            });
+        if(hora == data.hour){
+          for(var p = 0; p < eventos![i].listaPessoas.length; p++){
+            contPessoa = p;
           }
+          registrarEvento = true;
+          posicaoDia = i;
         }
       }
     }
+    return registrarEvento;
   }
 
   @override
   Widget build(BuildContext context) {
     DateTime ultimoDiaMes = DateTime(year, month + 1, 0);
-    // print('mes testeeeee$month');
-    // print('uktimo dia mes$ultimoDiaMesFormatted');
     DateTime ultimoDiaMesAnterior = DateTime(year, month, 0);
     ultimoDiaMesFormatted = ultimoDiaMes.day;
-    // print('ultimo dia formatado $ultimoDiaMesFormatted');
     ultimoDiaMesAnteriorFormatted = ultimoDiaMesAnterior.day;
     Calendar calendar = Calendar(dia: day, mes: month,
       ano: year, listaHora: listaHora);
-
-
 
     if(hora != 22){
       addHora();
     }    
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.orange,
+        title: Text('WSA2014 Events'),
+        actions: [
+          IconButton(
+            onPressed: (){
+              showModalBottomSheet(
+                context: context, 
+                builder: (BuildContext ctx){
+                  return SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Column(
+                      children: [
+                        // CheckboxListTile(
+                        //   value: , 
+                        //   onChanged: onChanged
+                        // )
+                      ],
+                    ),
+                  );
+                }
+              );
+            }, 
+            icon: Icon(Icons.filter_alt)
+          ),
+        ],
+      ),
       body: Visibility(
         visible: isLoadded,
         replacement: CircularProgressIndicator(),
@@ -173,20 +189,39 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListView.builder(
                 itemCount: calendar.listaHora.length,
                 itemBuilder: ((context, index) {
+                  verificaHora(listaHora[index].hora);
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text('${calendar.listaHora[index].hora}:${calendar.listaHora[index].minuto}'),
-                            Text(registrarEvento?'${eventos![index].evento}' : ''),
-                          ],
+                        SizedBox(
+                          width: double.infinity,
+                          height: 100,
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('${calendar.listaHora[index].hora}:${calendar.listaHora[index].minuto}',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                              registrarEvento ? Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text('${eventos![posicaoDia].evento}'), 
+                                    Text('${eventos![posicaoDia].descricao}'),
+                                    Text('${eventos![posicaoDia].listaPessoas[contPessoa].nome}')
+                                  ],
+                                ),
+                              ) : Row(children: [Text('')],),
+                            ],
+                          ),
                         ),
                         Divider(
                           color: Colors.black,
-
                         ),
                       ],
                     ),
