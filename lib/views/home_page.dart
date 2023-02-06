@@ -39,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> listaEventoFiltrado = [];
   String filtrado = '';
   int posicaoFilter = 0;
+  List<String> listaFiltrada = [];
 
 
   @override
@@ -82,13 +83,22 @@ class _MyHomePageState extends State<MyHomePage> {
     return listaHora;
   }
 
-  bool verificaHora(int hora){
+  bool verificaHora(int hora, int minuto){
     registrarEvento = false;
     posicaoDia = 0;
     for(var i =0; i < eventos!.length; i++){
       DateTime data = DateTime.parse(eventos![i].dataHora);
       if(data.day == day && data.month == month && data.year == year){
-        if(hora == data.hour){
+        if(hora == data.hour && minuto < 30){
+          print('> 30');
+          print(minuto);
+          for(var p = 0; p < eventos![i].listaPessoas.length; p++){
+            contPessoa = p;
+          }
+          registrarEvento = true;
+          posicaoDia = i;
+        }else if(hora == data.hour && minuto < 30){
+          print('< 30');
           for(var p = 0; p < eventos![i].listaPessoas.length; p++){
             contPessoa = p;
           }
@@ -101,14 +111,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   filtraEvento(int index, String filtro){
+    setState(() {
     if(eventoFilter[index] == true && filtro == 'Descricao'){
-      return eventos![posicaoDia].descricao;
+      listaFiltrada.add(eventos![posicaoDia].descricao);
     }else if(eventoFilter[index] == true && filtro == 'Participantes'){
-      return eventos![posicaoDia].listaPessoas[0].nome;
+      listaFiltrada.add(eventos![posicaoDia].listaPessoas[0].nome);
     }else if(eventoFilter[index] == true && filtro == 'Local'){
-      return eventos![posicaoDia].local;
+      listaFiltrada.add(eventos![posicaoDia].local);
     }
-
+    });
     return 'jajaja';
   }
 
@@ -130,46 +141,48 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Colors.orange,
         title: Text('WSA2014 Events'),
         actions: [
-          IconButton(
-            onPressed: (){
-              showModalBottomSheet(
-                context: context, 
-                builder: (BuildContext ctx){
-                  return StatefulBuilder(
-                    builder:(context, setState) {
-                      return SizedBox(
-                        width: 200,
-                        height: 200,
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: eventos!.length,
-                                itemBuilder: (context, index) {
-                                  return CheckboxListTile(
-                                    title: Text('${filter[index]}'),
-                                    value: eventoFilter[index], 
-                                    onChanged: (value) {
-                                      setState(() {
-                                        eventoFilter[index] = value!;
-                                        posicaoFilter = index;
-                                      });
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }, 
+          // IconButton(
+          //   onPressed: (){
+          //     setState(() {
+          //     showModalBottomSheet(
+          //       context: context, 
+          //       builder: (BuildContext ctx){
+          //         return StatefulBuilder(
+          //           builder:(context, setState) {
+          //             return SizedBox(
+          //               width: 200,
+          //               height: 200,
+          //               child: Column(
+          //                 children: [
+          //                   Expanded(
+          //                     child: ListView.builder(
+          //                       itemCount: eventos!.length,
+          //                       itemBuilder: (context, index) {
+          //                         return CheckboxListTile(
+          //                           title: Text('${filter[index]}'),
+          //                           value: eventoFilter[index], 
+          //                           onChanged: (value) {
+          //                             setState(() {
+          //                               eventoFilter[index] = value!;
+          //                               posicaoFilter = index;
+          //                             });
+          //                           },
+          //                         );
+          //                       },
+          //                     ),
+          //                   ),
+          //                 ],
+          //               ),
+          //             );
+          //           }, 
                     
-                  );
-                }
-              );
-            }, 
-            icon: Icon(Icons.filter_alt)
-          ),
+          //         );
+          //       }
+          //     );
+          //     });
+          //   }, 
+          //   // icon: Icon(Icons.filter_alt)
+          // ),
         ],
       ),
       body: Visibility(
@@ -226,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListView.builder(
                 itemCount: calendar.listaHora.length,
                 itemBuilder: ((context, index) {
-                  verificaHora(listaHora[index].hora);
+                  verificaHora(listaHora[index].hora, listaHora[index].minuto);
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -245,14 +258,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               registrarEvento ? Expanded(
                                 child: Column(
+                                  // listaFiltrada,
                                   children: [
                                     Text('${eventos![posicaoDia].evento}'), 
-                                    filter[posicaoFilter] == 'Descricao' && eventoFilter[posicaoFilter] ? 
-                                      Text('${eventos![posicaoDia].descricao}'): Text(''),
-                                    filter[posicaoFilter] == 'Participantes' && eventoFilter[posicaoFilter] ? Text('${eventos![posicaoDia].listaPessoas[contPessoa].nome}') : Text(''),
-                                    filter[posicaoFilter] == 'Local' && eventoFilter[posicaoFilter] ? Text('${eventos![posicaoDia].local}') : Text(''),
-                                  ],    
-                                    ),
+                                     
+                                      Text('${eventos![posicaoDia].descricao}'),
+                                   Text('${eventos![posicaoDia].listaPessoas[contPessoa].nome}'),
+                                    Text('${eventos![posicaoDia].local}')
+                                  ]
+                                ),
                               ) : Row(children: [Text('')],),
                             ],
                           ),
